@@ -1,0 +1,218 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f4f4;
+  }
+
+  .container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  header {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem 0;
+  }
+
+  header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  header h1 {
+    margin: 0;
+  }
+
+  nav ul {
+    display: flex;
+    list-style: none;
+  }
+
+  nav ul li {
+    margin-left: 1rem;
+  }
+
+  nav a {
+    color: #fff;
+    text-decoration: none;
+  }
+
+  h1, h2, h3 {
+    margin-bottom: 1rem;
+  }
+
+  .btn {
+    display: inline-block;
+    background: #333;
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+
+  .btn:hover {
+    background: #555;
+  }
+
+  .btn-secondary {
+    background: #6c757d;
+    color: #fff;
+  }
+
+  .btn-secondary:hover {
+    background: #5a6268;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  input[type="text"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 0.6rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  button {
+    background: #333;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  button:hover {
+    background: #555;
+  }
+
+  .surveys-list {
+    margin-top: 2rem;
+  }
+
+  .surveys-list ul {
+    list-style: none;
+  }
+
+  .surveys-list li {
+    background: #fff;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  .survey-links {
+    margin-top: 0.5rem;
+  }
+
+  .survey-links a {
+    color: #333;
+    text-decoration: none;
+  }
+
+  .survey-links a:hover {
+    text-decoration: underline;
+  }
+
+  .question {
+    background: #fff;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  .question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .question-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .move-up, .move-down {
+    background: #4CAF50;
+    color: white;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+
+  .remove-question {
+    background: #f44336;
+    color: white;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+
+  .options-container {
+    margin-top: 1rem;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .option input {
+    flex: 1;
+    margin-right: 0.5rem;
+  }
+
+  .remove-option {
+    background: #f44336;
+    color: white;
+    margin: 0;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+
+  .form-actions {
+    margin-top: 2rem;
+  }
+
+  footer {
+    background: #333;
+    color: #fff;
+    text-align: center;
+    padding: 1rem;
+    margin-top: 2rem;
+  }

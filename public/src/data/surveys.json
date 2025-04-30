@@ -1,0 +1,50 @@
+{
+  "surveys": [
+    {
+      "id": "b14166f3-b609-443b-b42a-db222531a55a",
+      "title": "Hinded123",
+      "description": "Järel vastamine",
+      "questions": [
+        {
+          "id": 0,
+          "text": "Millal?",
+          "type": "checkbox",
+          "options": [
+            {
+              "id": 0,
+              "text": "Täna"
+            },
+            {
+              "id": 1,
+              "text": "Eile"
+            },
+            {
+              "id": 2,
+              "text": "Ülehomme"
+            }
+          ]
+        },
+        {
+          "id": 1,
+          "text": "Test",
+          "type": "text",
+          "options": []
+        },
+        {
+          "id": 2,
+          "text": "AKA",
+          "type": "radio",
+          "options": [
+            {
+              "id": 0,
+              "text": "hoho"
+            }
+          ]
+        }
+      ],
+      "createdAt": "2025-04-30T07:57:26.724Z",
+      "updatedAt": "2025-04-30T08:18:33.059Z"
+    }
+  ],
+  "responses": []
+}

@@ -1,0 +1,31 @@
+<%- include('partials/header') %>
+
+<div class="container">
+  <h1>KysiMusTik</h1>
+  <p>Lihtne veebipõhine küsimustike rakendus</p>
+
+  <a href="/create" class="btn">Loo uus küsimustik</a>
+
+  <h2>Olemasolevad küsimustikud:</h2>
+  <div class="surveys-list">
+    <% if (surveys.length === 0) { %>
+      <p>Küsimustikke pole veel loodud.</p>
+    <% } else { %>
+      <ul>
+        <% surveys.forEach(survey => { %>
+          <li>
+            <h3><%= survey.title %></h3>
+            <p><%= survey.description %></p>
+            <div class="survey-links">
+              <a href="/survey/<%= survey.id %>">Vasta</a> |
+              <a href="/survey/<%= survey.id %>/results">Vaata tulemusi</a> |
+              <a href="/survey/<%= survey.id %>/edit">Muuda</a>
+            </div>
+          </li>
+        <% }); %>
+      </ul>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

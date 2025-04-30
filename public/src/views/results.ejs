@@ -1,0 +1,200 @@
+<%- include('partials/header') %>
+
+<div class="container">
+  <h1>Tulemused: <%= survey.title %></h1>
+  <p class="survey-description"><%= survey.description %></p>
+
+  <div class="results-summary">
+    <p>Kokku vastuseid: <strong><%= responses.length %></strong></p>
+  </div>
+
+  <% if (responses.length === 0) { %>
+    <div class="no-results">
+      <p>Sellele küsimustikule pole veel vastuseid.</p>
+    </div>
+  <% } else { %>
+    <div class="results-container">
+      <% survey.questions.forEach((question, questionIndex) => { %>
+        <div class="question-result">
+          <h3><%= questionIndex + 1 %>. <%= question.text %></h3>
+
+          <% if (question.type === 'text') { %>
+            <div class="text-responses">
+              <h4>Tekstivastused:</h4>
+              <ul class="responses-list">
+                <% responses.forEach(response => { %>
+                  <% if (response.answers && response.answers[question.id]) { %>
+                    <li><%= response.answers[question.id] %></li>
+                  <% } %>
+                <% }); %>
+              </ul>
+            </div>
+          <% } else if (question.type === 'radio') { %>
+            <div class="option-results">
+              <%
+                const optionCounts = {};
+                question.options.forEach(option => {
+                  optionCounts[option.id] = 0;
+                });
+
+                responses.forEach(response => {
+                  if (response.answers && response.answers[question.id]) {
+                    const selectedOption = response.answers[question.id];
+                    if (optionCounts[selectedOption] !== undefined) {
+                      optionCounts[selectedOption]++;
+                    }
+                  }
+                });
+              %>
+
+              <% question.options.forEach(option => { %>
+                <div class="option-result">
+                  <div class="option-label"><%= option.text %></div>
+                  <div class="option-count"><%= optionCounts[option.id] %> vastust</div>
+                  <div class="option-bar">
+                    <div class="option-bar-fill" style="width: <%= (optionCounts[option.id] / responses.length) * 100 %>%"></div>
+                  </div>
+                  <div class="option-percentage"><%= Math.round((optionCounts[option.id] / responses.length) * 100) %>%</div>
+                </div>
+              <% }); %>
+            </div>
+          <% } else if (question.type === 'checkbox') { %>
+            <div class="option-results">
+              <%
+                const optionCounts = {};
+                question.options.forEach(option => {
+                  optionCounts[option.id] = 0;
+                });
+
+                responses.forEach(response => {
+                  if (response.answers && response.answers[question.id]) {
+                    Object.keys(response.answers[question.id]).forEach(optionId => {
+                      if (response.answers[question.id][optionId] === 'true' && optionCounts[optionId] !== undefined) {
+                        optionCounts[optionId]++;
+                      }
+                    });
+                  }
+                });
+              %>
+
+              <% question.options.forEach(option => { %>
+                <div class="option-result">
+                  <div class="option-label"><%= option.text %></div>
+                  <div class="option-count"><%= optionCounts[option.id] %> vastust</div>
+                  <div class="option-bar">
+                    <div class="option-bar-fill" style="width: <%= (optionCounts[option.id] / responses.length) * 100 %>%"></div>
+                  </div>
+                  <div class="option-percentage"><%= Math.round((optionCounts[option.id] / responses.length) * 100) %>%</div>
+                </div>
+              <% }); %>
+            </div>
+          <% } %>
+        </div>
+      <% }); %>
+    </div>
+  <% } %>
+
+  <div class="actions">
+    <a href="/" class="btn">Tagasi avalehele</a>
+    <a href="/survey/<%= survey.id %>" class="btn">Vasta küsimustikule</a>
+  </div>
+</div>
+
+<style>
+  .results-summary {
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+  }
+
+  .no-results {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .question-result {
+    background: #fff;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  .responses-list {
+    list-style-type: none;
+    padding-left: 0;
+  }
+
+  .responses-list li {
+    background: #f8f9fa;
+    padding: 0.8rem;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+  }
+
+  .option-result {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .option-label {
+    width: 25%;
+    padding-right: 1rem;
+  }
+
+  .option-count {
+    width: 15%;
+    font-weight: bold;
+  }
+
+  .option-bar {
+    width: 50%;
+    height: 20px;
+    background: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .option-bar-fill {
+    height: 100%;
+    background: #4CAF50;
+    border-radius: 10px;
+  }
+
+  .option-percentage {
+    width: 10%;
+    text-align: right;
+    font-weight: bold;
+  }
+
+  .actions {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .option-label {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+
+    .option-count {
+      width: 30%;
+    }
+
+    .option-bar {
+      width: 50%;
+    }
+
+    .option-percentage {
+      width: 20%;
+    }
+  }
+</style>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,40 @@
+<%- include('partials/header') %>
+
+<div class="container">
+  <div class="thanks-container">
+    <h1>Täname vastamast!</h1>
+    <p>Teie vastused on edukalt salvestatud.</p>
+    
+    <div class="actions">
+      <a href="/" class="btn">Tagasi avalehele</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .thanks-container {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 600px;
+    margin: 2rem auto;
+  }
+  
+  .thanks-container h1 {
+    color: #4CAF50;
+    margin-bottom: 1rem;
+  }
+  
+  .thanks-container p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .actions {
+    margin-top: 2rem;
+  }
+</style>
+
+<%- include('partials/footer') %>

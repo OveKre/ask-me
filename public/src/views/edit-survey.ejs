@@ -1,0 +1,339 @@
+<%- include('partials/header') %>
+
+<div class="container">
+  <h1>Muuda küsimustikku</h1>
+
+  <form id="survey-form">
+    <div class="form-group">
+      <label for="title">Pealkiri:</label>
+      <input type="text" id="title" name="title" value="<%= survey.title %>" required>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Kirjeldus:</label>
+      <textarea id="description" name="description"><%= survey.description %></textarea>
+    </div>
+
+    <div id="questions-container">
+      <!-- Küsimused lisatakse siia JavaScriptiga -->
+    </div>
+
+    <button type="button" id="add-question">Lisa küsimus</button>
+
+    <input type="hidden" id="questions-json" name="questions">
+    <input type="hidden" id="survey-id" value="<%= survey.id %>">
+
+    <div class="form-actions">
+      <button type="submit">Salvesta muudatused</button>
+      <a href="/" class="btn btn-secondary">Tühista</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Frontend JavaScript küsimustiku muutmiseks
+  document.addEventListener('DOMContentLoaded', () => {
+    const questionsContainer = document.getElementById('questions-container');
+    const addQuestionBtn = document.getElementById('add-question');
+    const form = document.getElementById('survey-form');
+    const questionsJsonInput = document.getElementById('questions-json');
+    const surveyId = document.getElementById('survey-id').value;
+    let questionCount = 0;
+
+    // Funktsioon küsimuste numbrite uuendamiseks
+    const updateQuestionNumbers = () => {
+      const questions = questionsContainer.querySelectorAll('.question');
+      questions.forEach((question, index) => {
+        const questionHeader = question.querySelector('h3');
+        questionHeader.textContent = `Küsimus ${index + 1}`;
+      });
+    };
+
+    // Funktsioon olemasoleva küsimuse lisamise jaoks
+    const addExistingQuestion = (question) => {
+      const questionDiv = document.createElement('div');
+      questionDiv.className = 'question';
+      questionDiv.dataset.questionId = question.id;
+
+      questionDiv.innerHTML = `
+        <div class="question-header">
+          <h3>Küsimus ${questionCount + 1}</h3>
+          <div class="question-actions">
+            <button type="button" class="move-up" title="Liiguta üles">↑</button>
+            <button type="button" class="move-down" title="Liiguta alla">↓</button>
+            <button type="button" class="remove-question" title="Eemalda küsimus">×</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Küsimuse tekst:</label>
+          <input type="text" class="question-text" value="${question.text}" required>
+        </div>
+        <div class="form-group">
+          <label>Küsimuse tüüp:</label>
+          <select class="question-type">
+            <option value="text" ${question.type === 'text' ? 'selected' : ''}>Vabatekst</option>
+            <option value="radio" ${question.type === 'radio' ? 'selected' : ''}>Valikvastus (üks)</option>
+            <option value="checkbox" ${question.type === 'checkbox' ? 'selected' : ''}>Valikvastus (mitu)</option>
+          </select>
+        </div>
+        <div class="options-container" style="display: ${question.type === 'radio' || question.type === 'checkbox' ? 'block' : 'none'};">
+          <label>Vastusevariandid:</label>
+          <div class="options-list"></div>
+          <button type="button" class="add-option">Lisa variant</button>
+        </div>
+      `;
+
+      questionsContainer.appendChild(questionDiv);
+
+      // Tüübi muutmise kuulamine
+      const typeSelect = questionDiv.querySelector('.question-type');
+      const optionsContainer = questionDiv.querySelector('.options-container');
+
+      typeSelect.addEventListener('change', () => {
+        if (typeSelect.value === 'radio' || typeSelect.value === 'checkbox') {
+          optionsContainer.style.display = 'block';
+        } else {
+          optionsContainer.style.display = 'none';
+        }
+      });
+
+      // Vastusevariandi lisamise nupp
+      const addOptionBtn = questionDiv.querySelector('.add-option');
+      const optionsList = questionDiv.querySelector('.options-list');
+
+      // Lisame olemasolevad valikuvariandid
+      if (question.options && question.options.length > 0) {
+        question.options.forEach(option => {
+          const optionDiv = document.createElement('div');
+          optionDiv.className = 'option';
+          optionDiv.innerHTML = `
+            <input type="text" class="option-text" value="${option.text}" placeholder="Sisesta variant">
+            <button type="button" class="remove-option">X</button>
+          `;
+          optionsList.appendChild(optionDiv);
+
+          // Vastusevariandi eemaldamise nupp
+          optionDiv.querySelector('.remove-option').addEventListener('click', () => {
+            optionsList.removeChild(optionDiv);
+          });
+        });
+      }
+
+      addOptionBtn.addEventListener('click', () => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'option';
+        optionDiv.innerHTML = `
+          <input type="text" class="option-text" placeholder="Sisesta variant">
+          <button type="button" class="remove-option">X</button>
+        `;
+        optionsList.appendChild(optionDiv);
+
+        // Vastusevariandi eemaldamise nupp
+        optionDiv.querySelector('.remove-option').addEventListener('click', () => {
+          optionsList.removeChild(optionDiv);
+        });
+      });
+
+      // Küsimuse eemaldamise nupp
+      questionDiv.querySelector('.remove-question').addEventListener('click', () => {
+        questionsContainer.removeChild(questionDiv);
+        updateQuestionNumbers();
+      });
+
+      // Küsimuse üles liigutamise nupp
+      questionDiv.querySelector('.move-up').addEventListener('click', () => {
+        const prevQuestion = questionDiv.previousElementSibling;
+        if (prevQuestion) {
+          questionsContainer.insertBefore(questionDiv, prevQuestion);
+          updateQuestionNumbers();
+        }
+      });
+
+      // Küsimuse alla liigutamise nupp
+      questionDiv.querySelector('.move-down').addEventListener('click', () => {
+        const nextQuestion = questionDiv.nextElementSibling;
+        if (nextQuestion) {
+          questionsContainer.insertBefore(nextQuestion, questionDiv);
+          updateQuestionNumbers();
+        }
+      });
+
+      questionCount++;
+    };
+
+    // Küsimuse lisamise loogika
+    addQuestionBtn.addEventListener('click', () => {
+      const questionDiv = document.createElement('div');
+      questionDiv.className = 'question';
+      questionDiv.dataset.questionId = questionCount;
+
+      questionDiv.innerHTML = `
+        <div class="question-header">
+          <h3>Küsimus ${questionCount + 1}</h3>
+          <div class="question-actions">
+            <button type="button" class="move-up" title="Liiguta üles">↑</button>
+            <button type="button" class="move-down" title="Liiguta alla">↓</button>
+            <button type="button" class="remove-question" title="Eemalda küsimus">×</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Küsimuse tekst:</label>
+          <input type="text" class="question-text" required>
+        </div>
+        <div class="form-group">
+          <label>Küsimuse tüüp:</label>
+          <select class="question-type">
+            <option value="text">Vabatekst</option>
+            <option value="radio">Valikvastus (üks)</option>
+            <option value="checkbox">Valikvastus (mitu)</option>
+          </select>
+        </div>
+        <div class="options-container" style="display: none;">
+          <label>Vastusevariandid:</label>
+          <div class="options-list"></div>
+          <button type="button" class="add-option">Lisa variant</button>
+        </div>
+      `;
+
+      questionsContainer.appendChild(questionDiv);
+
+      // Tüübi muutmise kuulamine
+      const typeSelect = questionDiv.querySelector('.question-type');
+      const optionsContainer = questionDiv.querySelector('.options-container');
+
+      typeSelect.addEventListener('change', () => {
+        if (typeSelect.value === 'radio' || typeSelect.value === 'checkbox') {
+          optionsContainer.style.display = 'block';
+        } else {
+          optionsContainer.style.display = 'none';
+        }
+      });
+
+      // Vastusevariandi lisamise nupp
+      const addOptionBtn = questionDiv.querySelector('.add-option');
+      const optionsList = questionDiv.querySelector('.options-list');
+
+      addOptionBtn.addEventListener('click', () => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'option';
+        optionDiv.innerHTML = `
+          <input type="text" class="option-text" placeholder="Sisesta variant">
+          <button type="button" class="remove-option">X</button>
+        `;
+        optionsList.appendChild(optionDiv);
+
+        // Vastusevariandi eemaldamise nupp
+        optionDiv.querySelector('.remove-option').addEventListener('click', () => {
+          optionsList.removeChild(optionDiv);
+        });
+      });
+
+      // Küsimuse eemaldamise nupp
+      questionDiv.querySelector('.remove-question').addEventListener('click', () => {
+        questionsContainer.removeChild(questionDiv);
+        updateQuestionNumbers();
+      });
+
+      // Küsimuse üles liigutamise nupp
+      questionDiv.querySelector('.move-up').addEventListener('click', () => {
+        const prevQuestion = questionDiv.previousElementSibling;
+        if (prevQuestion) {
+          questionsContainer.insertBefore(questionDiv, prevQuestion);
+          updateQuestionNumbers();
+        }
+      });
+
+      // Küsimuse alla liigutamise nupp
+      questionDiv.querySelector('.move-down').addEventListener('click', () => {
+        const nextQuestion = questionDiv.nextElementSibling;
+        if (nextQuestion) {
+          questionsContainer.insertBefore(nextQuestion, questionDiv);
+          updateQuestionNumbers();
+        }
+      });
+
+      questionCount++;
+    });
+
+    // Vormi esitamine
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      const questions = [];
+
+      // Kogume kokku kõik küsimused
+      document.querySelectorAll('.question').forEach((questionDiv, index) => {
+        const questionText = questionDiv.querySelector('.question-text').value;
+        const questionType = questionDiv.querySelector('.question-type').value;
+        const question = {
+          id: index, // Kasutame indeksit ID-na, et tagada õige järjestus
+          text: questionText,
+          type: questionType,
+          options: []
+        };
+
+        // Kogume valikuvariandid, kui need on olemas
+        if (questionType === 'radio' || questionType === 'checkbox') {
+          questionDiv.querySelectorAll('.option').forEach((optionDiv, index) => {
+            const optionText = optionDiv.querySelector('.option-text').value;
+            if (optionText) {
+              question.options.push({
+                id: index,
+                text: optionText
+              });
+            }
+          });
+        }
+
+        questions.push(question);
+      });
+
+      // Lisame küsimused peidetud väljale
+      questionsJsonInput.value = JSON.stringify(questions);
+
+      // Saadame andmed serverisse
+      console.log('Sending update request for survey ID:', surveyId);
+      console.log('Data being sent:', {
+        title,
+        description,
+        questions: JSON.stringify(questions)
+      });
+
+      fetch(`/survey/${surveyId}/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          questions: JSON.stringify(questions)
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Serveri viga: ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Küsimustik edukalt uuendatud:', data);
+        window.location.href = '/';
+      })
+      .catch(error => {
+        console.error('Viga:', error);
+        alert('Küsimustiku uuendamisel tekkis viga. Palun proovige uuesti.');
+      });
+    });
+
+    // Laeme olemasolevad küsimused
+    const existingQuestions = <%- JSON.stringify(survey.questions) %>;
+    existingQuestions.forEach(question => {
+      addExistingQuestion(question);
+    });
+  });
+</script>
+
+<%- include('partials/footer') %>

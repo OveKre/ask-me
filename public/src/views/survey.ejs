@@ -1,0 +1,79 @@
+<%- include('partials/header') %>
+
+<div class="container">
+  <h1><%= survey.title %></h1>
+  <p class="survey-description"><%= survey.description %></p>
+
+  <form id="survey-response-form" action="/survey/<%= survey.id %>/submit" method="POST">
+    <% survey.questions.forEach((question, questionIndex) => { %>
+      <div class="question-card">
+        <h3><%= questionIndex + 1 %>. <%= question.text %></h3>
+
+        <% if (question.type === 'text') { %>
+          <div class="form-group">
+            <textarea name="answers[<%= question.id %>]" class="form-control" rows="3" required></textarea>
+          </div>
+        <% } else if (question.type === 'radio') { %>
+          <div class="form-group">
+            <% question.options.forEach(option => { %>
+              <div class="radio-option">
+                <input type="radio" id="option-<%= question.id %>-<%= option.id %>"
+                       name="answers[<%= question.id %>]" value="<%= option.id %>" required>
+                <label for="option-<%= question.id %>-<%= option.id %>"><%= option.text %></label>
+              </div>
+            <% }); %>
+          </div>
+        <% } else if (question.type === 'checkbox') { %>
+          <div class="form-group">
+            <% question.options.forEach(option => { %>
+              <div class="checkbox-option">
+                <input type="checkbox" id="option-<%= question.id %>-<%= option.id %>"
+                       name="answers[<%= question.id %>][<%= option.id %>]" value="true">
+                <label for="option-<%= question.id %>-<%= option.id %>"><%= option.text %></label>
+              </div>
+            <% }); %>
+          </div>
+        <% } %>
+      </div>
+    <% }); %>
+
+    <div class="form-actions">
+      <button type="submit" class="btn">Saada vastused</button>
+      <a href="/" class="btn btn-secondary">Tagasi</a>
+    </div>
+  </form>
+</div>
+
+<style>
+  .question-card {
+    background: #fff;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  .survey-description {
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+  }
+
+  .radio-option, .checkbox-option {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .radio-option input, .checkbox-option input {
+    margin-right: 0.5rem;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+</style>
+
+<%- include('partials/footer') %>
